@@ -2,16 +2,19 @@
 #include "button.h"
 #include "buzzer.h"
 
-#define PIN_BUZZER 6
-#define PIN_BUTTON_OFF 5
 
-Button buttonOff(PIN_BUTTON_OFF);
+#define PIN_BUZZER 6
+#define PIN_BUTTON 5
+
+Button button(PIN_BUTTON);
 Buzzer buzzer(PIN_BUZZER);
 
 
-int notes[] = {NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_DS3, NOTE_SILENCE};
-double durations[] = {8, 8, 1, 8, 1, 8, 1, 24};
-int melodyLength = 8;
+int notes[] = {NOTE_G4,NOTE_SILENCE,NOTE_G4,NOTE_SILENCE,NOTE_G4,NOTE_SILENCE,NOTE_DS4,NOTE_SILENCE,NOTE_AS5,NOTE_SILENCE,NOTE_G4,NOTE_SILENCE,NOTE_DS4,NOTE_SILENCE,NOTE_AS5,NOTE_SILENCE,NOTE_G4,NOTE_SILENCE,  NOTE_D5,NOTE_SILENCE,NOTE_D5,NOTE_SILENCE,NOTE_D5,NOTE_DS5,NOTE_AS5,NOTE_FS4,NOTE_DS4,NOTE_AS5,NOTE_G4, NOTE_G5,NOTE_G4,NOTE_G5,NOTE_FS5,NOTE_F5,NOTE_E5,NOTE_DS5,NOTE_E5, NOTE_GS4,NOTE_GS5,NOTE_GS4,NOTE_C5,NOTE_B5,NOTE_AS5,NOTE_A5,NOTE_AS5 ,NOTE_DS4,NOTE_FS4,NOTE_DS4,NOTE_AS5,NOTE_G4,NOTE_DS4,NOTE_AS5,NOTE_G4};
+double durations[] = {4,1,4,1,4,1,2,1,4,1,2,1,1,1,4,1,2, 4,1,4,1,4,2,1,4,2,1,8,4,2,1,4,2,1,1,1,2,2,4,2,1,1,1,2,2,4,2,1,4,2,1,8};
+int melodyLength = 52;
+
+bool flag = false;
 
 void setup() {
     buzzer.setMelody(notes, durations, melodyLength);
@@ -20,26 +23,17 @@ void setup() {
 
 void loop() {
   
-    buzzer.playSound();
-    if (buttonOff.wasPressed())
+    if (button.wasPressed())
     {
-        buzzer.turnSoundOff();
+      flag = true;
+      for(int i=0;i<=5;i++){                                  
+        tone(PIN_BUZZER,NOTE_G4); // быстро
+        delay(50);
+        noTone(PIN_BUZZER); // 5 sec
+        delay(4950);
+      }                                 
     }
-}
-
-void print_rgb(colorData rgb)
-{
-  Serial.print(rgb.value[TCS230_RGB_R]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_G]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_B]);
-  Serial.println();
-}
-
-void set_rgb_led(colorData rgb)
-{
-    analogWrite(R_OUT, 255 - rgb.value[TCS230_RGB_R]);
-    analogWrite(G_OUT, 255 - rgb.value[TCS230_RGB_G]);
-    analogWrite(B_OUT, 255 - rgb.value[TCS230_RGB_B]);
+    if (flag){
+      buzzer.playSound();
+    }
 }
