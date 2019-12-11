@@ -14,7 +14,11 @@ int notes[] = {NOTE_G4,NOTE_SILENCE,NOTE_G4,NOTE_SILENCE,NOTE_G4,NOTE_SILENCE,NO
 double durations[] = {4,1,4,1,4,1,2,1,4,1,2,1,1,1,4,1,2, 4,1,4,1,4,2,1,4,2,1,8,4,2,1,4,2,1,1,1,2,2,4,2,1,1,1,2,2,4,2,1,4,2,1,8};
 int melodyLength = 52;
 
-bool flag = false;
+bool buttonWasPressed = false;
+uint64_t startTiming = millis();
+uint64_t screamTiming = millis();
+//uint64_t screamTiming = millis();
+bool isScreaming = false;
 
 void setup() {
     buzzer.setMelody(notes, durations, melodyLength);
@@ -25,15 +29,24 @@ void loop() {
   
     if (button.wasPressed())
     {
-      flag = true;
-      for(int i=0;i<=5;i++){                                  
-        tone(PIN_BUZZER,NOTE_G4); // быстро
-        delay(50);
-        noTone(PIN_BUZZER); // 5 sec
-        delay(4950);
-      }                                 
-    }
-    if (flag){
-      buzzer.playSound();
+      startTiming = millis();
+      screamTiming = millis();
+      buttonWasPressed = true;
+     }
+    if (buttonWasPressed){
+      if(millis() - startTiming<30000){
+        if (!isScreaming && millis()-screamTiming > 4950) {
+          tone(PIN_BUZZER,NOTE_G4);
+          screamTiming=millis();
+          isScreaming = true;
+        }
+        else if (millis()-screamTiming>50){
+          isScreaming = false;
+          noTone(PIN_BUZZER);
+        }
+      }
+      else {
+        buzzer.playSound();
+      }
     }
 }
